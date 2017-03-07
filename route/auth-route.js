@@ -2,7 +2,8 @@
 
 const Router = require('express').Router;
 const debug = require('debug')('cfgram:auth-route');
-const jsonParser = require('body-parser');
+const jsonParser = require('body-parser').json();
+const createError = require('http-errors');
 
 const basicAuth = require('../lib/auth-middleware.js');
 const User = require('../model/user.js');
@@ -21,7 +22,7 @@ authRouter.post('/api/signup', jsonParser, function(req, res, next) {
   .then( user => user.save())
   .then( user => user.generateToken())
   .then( token => res.send(token))
-  .catch(next);
+  .catch( () => next(createError(400, 'bad request')));
 });
 
 authRouter.get('/api/signin', basicAuth, function(req, res, next) {
@@ -31,5 +32,5 @@ authRouter.get('/api/signin', basicAuth, function(req, res, next) {
   .then( user => user.comparePasswordHash(req.auth.password))
   .then( user => user.generateToken())
   .then( token => res.send(token))
-  .catch( err => next(err));
+  .catch( () => next(createError(400, 'bad request')));
 });

@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
 const errors = require('./lib/error-middleware.js');
-const basicAuth = require('./lib/auth-middleware.js');
+const authRouter = require('./route/auth-route.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -20,7 +20,7 @@ mongoose.connect(process.env.MONGODB_URI);
 app.use(cors());
 app.use(morgan('dev'));
 
-app.use(basicAuth);
+app.use(authRouter);
 app.use(errors);
 
 app.listen(PORT, () => {

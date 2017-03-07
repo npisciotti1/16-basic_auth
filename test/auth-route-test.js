@@ -33,10 +33,60 @@ describe('Auth Routes', function() {
         .send(exampleUser)
         .end((err, res) => {
           if(err) return done(err);
-          console.log('response token:', res.body);
+          console.log('response token:', res.text);
           expect(res.status).to.equal(200);
-          expect(res.body).to.be.a('string');
+          expect(res.text).to.be.a('string');
           done();
+        });
+      });
+    });
+    describe('with an invalid body', function() {
+      it('should return a 400 error', done => {
+        request.post(`${url}/api/signup`)
+        .send('invalid body')
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('GET: /api/signin', function() {
+    describe('With a valid body', () => {
+      before( done => {
+        let user = new User(exampleUser);
+        user.generatePasswordHash(exampleUser.password)
+        .then( user => user.save())
+        .then( user => {
+          this.tempUser = user;
+          done();
+        })
+        .catch(done);
+      });
+      after( done => {
+        User.remove({})
+        .then( () => done())
+        .catch(done);
+      });
+      it('should return a token', done => {
+        request.get(`${url}/api/signin`)
+        .auth('nikko', 'soopersekret')
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.text).to.be.a('string');
+          done();
+        });
+      });
+
+      describe('with an invalid body', function() {
+        it('should return a 401 error', done => {
+          request.get(`${url}/api/signin`)
+          .auth('just-nikko')
+          .end((err, res) => {
+            expect(res.status).to.equal(401);
+            done();
+          });
         });
       });
     });
