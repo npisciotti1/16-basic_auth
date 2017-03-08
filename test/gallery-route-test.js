@@ -139,5 +139,30 @@ describe('Gallery Routes', function () {
         });
       });
     });
+    describe('with an invalid token', () => {
+      it('should return a 401', done => {
+        request.get(`${url}/api/gallery/${this.tempGallery._id}`)
+        .set({
+          Authorization: ''
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          done();
+        });
+      });
+    });
+    describe('with an invalid id', () => {
+      let invalidId = '123-invalid-id';
+      it('should return a 404', done => {
+        request.get(`${url}/api/gallery/${invalidId}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          done();
+        });
+      });
+    });
   });
 });

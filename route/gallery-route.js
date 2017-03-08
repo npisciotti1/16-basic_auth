@@ -23,11 +23,10 @@ galleryRouter.post('/api/gallery', bearerAuth, jsonParser, function(req, res, ne
 
 galleryRouter.get('/api/gallery/:id', bearerAuth, function(req, res, next) {
   debug('GET /api/gallery/:id');
-  console.log('we got here, heres req.params.id', req.params.id);
 
-  Gallery.findOne({ findHash: req.params.id })
+  Gallery.findById(req.params.id)
   .then( gallery => res.json(gallery))
-  .catch( () => next(createError(400, 'bad request')));
+  .catch( () => next(createError(404, 'not found')));
 });
 
 galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next) {
@@ -35,5 +34,5 @@ galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next) {
 
   Gallery.findByIdAndRemove(req.params.id)
   .then( () => res.status(204).send('no content'))
-  .catch( () => next(createError(400, 'bad request')));
+  .catch( () => next(createError(404, 'not found')));
 });
