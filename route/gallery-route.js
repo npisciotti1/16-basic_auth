@@ -29,6 +29,15 @@ galleryRouter.get('/api/gallery/:id', bearerAuth, function(req, res, next) {
   .catch( () => next(createError(404, 'not found')));
 });
 
+galleryRouter.put('/api/gallery/:id', bearerAuth, jsonParser, function(req, res, next) {
+  debug('PUT /api/gallery/:id');
+
+
+  Gallery.findByIdAndUpdate(req.params.id, req.body, {new: true})
+  .then( gallery => res.json(gallery))
+  .catch( () => next(createError(404, 'not found')));
+});
+
 galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next) {
   debug('DELETE /api/gallery/:id');
 

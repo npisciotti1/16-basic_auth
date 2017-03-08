@@ -165,4 +165,64 @@ describe('Gallery Routes', function () {
       });
     });
   });
+
+  describe('PUT /api/gallery/:id', function() {
+    describe('with a valid token and body', () => {
+      before( done => {
+        new User(exampleUser)
+        .generatePasswordHash(exampleUser.password)
+        .then( user => user.save())
+        .then( user => {
+          this.tempUser = user;
+          return user.generateToken();
+        })
+        .then( token => {
+          this.tempToken = token;
+          done();
+        })
+        .catch(done);
+      });
+      before( done => {
+        exampleGallery.userID = this.tempUser._id;
+        new Gallery(exampleGallery).save()
+        .then( gallery => {
+          this.tempGallery = gallery;
+          done();
+        })
+        .catch(done);
+      });
+      after( () => {
+        delete exampleGallery.userID;
+      });
+      it('should return an updated gallery', done => {
+        let updatedGallery = { name: 'updated gallery', description: 'dis the new shit'};
+        request.put(`${url}/api/gallery/${this.tempGallery._id}`)
+        .send(updatedGallery)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if(err) return done(err);
+          expect(res.status).to.equal(200);
+          expect(res.body.name).to.equal('updated gallery');
+          expect(res.body.description).to.equal('dis the new shit');
+          done();
+        });
+      });
+    });
+    describe('with an invalid token', () => {
+      let updatedGallery = { name: 'updated gallery', description: 'dis the new shit'};
+      it('should return a 401 error', done => {
+        request.put(`${url}/api/gallery/${this.tempGallery._id}`)
+        .send(updatedGallery)
+        .set({
+          Authorization: ''
+        })
+        .send((err, res) => {
+          expect(res.status).to.equal(401);
+          done();
+        });
+      });
+    });
+  });
 });
