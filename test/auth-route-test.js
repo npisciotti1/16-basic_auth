@@ -33,7 +33,6 @@ describe('Auth Routes', function() {
         .send(exampleUser)
         .end((err, res) => {
           if(err) return done(err);
-          console.log('response token:', res.text);
           expect(res.status).to.equal(200);
           expect(res.text).to.be.a('string');
           done();
