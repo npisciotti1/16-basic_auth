@@ -8,6 +8,8 @@ const Promise = require('bluebird');
 const User = require('../model/user.js');
 const Gallery = require('../model/gallery.js');
 
+require('../server.js');
+
 const url = `http://localhost:${process.env.PORT}`;
 
 mongoose.Promise = Promise;
@@ -85,6 +87,52 @@ describe('Gallery Routes', function () {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
+          done();
+        });
+      });
+    });
+  });
+  describe('GET /api/gallery/:id', function() {
+    describe('with a valid body', () => {
+      before( done => {
+        new User(exampleUser)
+        .generatePasswordHash(exampleUser.password)
+        .then( user => user.save())
+        .then( user => {
+          this.tempUser = user;
+          return user.generateToken();
+        })
+        .then( token => {
+          this.tempToken = token;
+          done();
+        })
+        .catch(done);
+      });
+      before( done => {
+        exampleGallery.userID = this.tempUser._id.toString();
+        new Gallery(exampleGallery).save()
+        .then( gallery => {
+          this.tempGallery = gallery;
+          done();
+        })
+        .catch(done);
+      });
+
+      after( done => {
+        delete exampleGallery.userID;
+        done();
+      });
+
+      it('should return a gallery', done => {
+        request.get(`${url}/api/gallery/${this.tempGallery._id}`)
+        .set({
+          Authorization: `Bearer ${this.tempToken}`
+        })
+        .end((err, res) => {
+          if(err) return done(err);
+          // console.log('this.tempGallery:', this.tempGallery);
+          // console.log('this.tempToken:', this.tempToken);
+          expect(res.status).to.equal(200);
           done();
         });
       });

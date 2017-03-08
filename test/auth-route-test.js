@@ -5,7 +5,7 @@ const request = require('superagent');
 const Promise = require('bluebird');
 const mongoose = require('mongoose');
 const User = require('../model/user.js');
-
+ 
 mongoose.Promise = Promise;
 
 require('../server.js');
