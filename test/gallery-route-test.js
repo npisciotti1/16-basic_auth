@@ -130,9 +130,11 @@ describe('Gallery Routes', function () {
         })
         .end((err, res) => {
           if(err) return done(err);
-          // console.log('this.tempGallery:', this.tempGallery);
-          // console.log('this.tempToken:', this.tempToken);
+          let date = new Date(res.body.created).toString();
           expect(res.status).to.equal(200);
+          expect(res.body.name).to.equal(exampleGallery.name);
+          expect(res.body.description).to.equal(exampleGallery.description);
+          expect(date).to.not.equal('invalid date');
           done();
         });
       });

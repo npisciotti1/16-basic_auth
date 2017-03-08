@@ -12,7 +12,6 @@ const authRouter = module.exports = Router();
 
 authRouter.post('/api/signup', jsonParser, function(req, res, next) {
   debug('POST: /api/signup');
-  console.log('we got here');
 
   let password = req.body.password;
   delete req.body.password;

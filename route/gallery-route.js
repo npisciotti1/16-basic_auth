@@ -13,18 +13,21 @@ const galleryRouter = module.exports = Router();
 galleryRouter.post('/api/gallery', bearerAuth, jsonParser, function(req, res, next) {
   debug('POST /api/gallery');
 
+  if(!req.user) return next(createError(400, 'bad request'));
+
   req.body.userID = req.user._id;
   new Gallery(req.body).save()
   .then( gallery => res.json(gallery))
-  .catch(next);
+  .catch( () => next(createError(400, 'bad request')));
 });
 
-galleryRouter.get('/api/gallery:id', bearerAuth, function(req, res, next) {
-  debug('GET /api/gallery:id');
+galleryRouter.get('/api/gallery/:id', bearerAuth, function(req, res, next) {
+  debug('GET /api/gallery/:id');
+  console.log('we got here, heres req.params.id', req.params.id);
 
   Gallery.findOne({ findHash: req.params.id })
   .then( gallery => res.json(gallery))
-  .catch(next);
+  .catch( () => next(createError(400, 'bad request')));
 });
 
 galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next) {
@@ -32,5 +35,5 @@ galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next) {
 
   Gallery.findByIdAndRemove(req.params.id)
   .then( () => res.status(204).send('no content'))
-  .catch(next);
+  .catch( () => next(createError(400, 'bad request')));
 });
