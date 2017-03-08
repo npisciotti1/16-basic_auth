@@ -11,6 +11,7 @@ const dotenv = require('dotenv');
 const errors = require('./lib/error-middleware.js');
 const authRouter = require('./route/auth-route.js');
 const galleryRouter = require('./route/gallery-route.js');
+const picRouter = require('./route/pic-route.js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,8 +24,11 @@ app.use(morgan('dev'));
 
 app.use(authRouter);
 app.use(galleryRouter);
+app.use(picRouter);
 app.use(errors);
 
-app.listen(PORT, () => {
+const server = module.exports = app.listen(PORT, () => {
   debug(`Port is up yo: ${PORT}`);
 });
+
+server.isRunning = true;

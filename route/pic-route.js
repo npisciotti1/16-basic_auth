@@ -30,7 +30,7 @@ function s3UploadProm(params) {
       resolve(data);
     });
   });
-};
+}
 
 picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('image'), function(req, res, next) {
   debug('POST /api/gallery/:galleryID/pic');
@@ -46,5 +46,22 @@ picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('image')
     Bucket: process.env.AWS_BUCKET,
     Key: `${req.file.filename}${ext}`,
     Body: fs.createReadStream(req.file.path)
-  }
-})
+  };
+
+  Gallery.findById(req.params.galleryID)
+  .then( () => s3UploadProm(params))
+  .then( data => {
+    del([`${dataDir}/*`]);
+    let picData = {
+      name: req.body.name,
+      description: req.body.description,
+      userID: req.user._id,
+      galleryID: req.params.galleryID,
+      objectKey: data.Key,
+      imageURI: data.Location
+    };
+    return new Pic(picData).save();
+  })
+  .then( pic => res.json(pic))
+  .catch( err => next(err));
+});
