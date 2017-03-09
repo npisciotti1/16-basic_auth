@@ -8,8 +8,8 @@ const Pic = require('../model/pic.js');
 const User = require('../model/user.js');
 const Gallery = require('../model/gallery.js');
 
-const serverToggle = require('./lib/server-toggle.js');
 const server = require('../server.js');
+const serverToggle = require('./lib/server-toggle.js');
 
 const url = `http://localhost:${process.env.PORT}`;
 
@@ -31,5 +31,24 @@ const examplePic = {
 };
 
 describe('Pic Routes', function() {
+  before( done => {
+    serverToggle.serverOn(server, done);
+  });
+  after( done => {
+    serverToggle.serverOff(server, done);
+  });
+  afterEach( done => {
+    Promise.all([
+      Pic.remove({}),
+      User.remove({}),
+      Gallery.remove({})
+    ])
+    .then( done => done())
+    .catch(done);
+  });
+  describe('POST /api/gallery/:galleryID/pic', function() {
+    describe('with a valid body', function() {
 
+    })
+  })
 });

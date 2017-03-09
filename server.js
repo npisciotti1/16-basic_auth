@@ -19,8 +19,12 @@ const PORT = process.env.PORT || 3000;
 dotenv.load();
 mongoose.connect(process.env.MONGODB_URI);
 
+//ternary operator, if PRODUCTION evals to true, it uses 'common', if PRODUCTION
+//evals to false, 'dev' is used.
+let morganFormat = process.env.PRODUCTION ? 'common' : 'dev';
+
 app.use(cors());
-app.use(morgan('dev'));
+app.use(morgan(morganFormat));
 
 app.use(authRouter);
 app.use(galleryRouter);
