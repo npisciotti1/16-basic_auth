@@ -1,11 +1,14 @@
 'use strict';
 
+require('./lib/test-env.js');
+
 const expect = require('chai').expect;
 const request = require('superagent');
 const Promise = require('bluebird');
 const mongoose = require('mongoose');
 const User = require('../model/user.js');
- 
+const awsMocks = require('./lib/aws-mocks.js');
+
 mongoose.Promise = Promise;
 
 require('../server.js');
