@@ -1,12 +1,12 @@
 'use strict';
 
-require('./lib/test-env.js');
+// require('./lib/test-env.js');
 
 const expect = require('chai').expect;
 const request = require('superagent');
 const mongoose = require('mongoose');
 const Promise = require('bluebird');
-const awsMocks = require('./lib/aws-mocks.js');
+// const awsMocks = require('./lib/aws-mocks.js');
 
 const User = require('../model/user.js');
 const Gallery = require('../model/gallery.js');
@@ -170,33 +170,34 @@ describe('Gallery Routes', function () {
   });
 
   describe('PUT /api/gallery/:id', function() {
+    before( done => {
+      new User(exampleUser)
+      .generatePasswordHash(exampleUser.password)
+      .then( user => user.save())
+      .then( user => {
+        this.tempUser = user;
+        return user.generateToken();
+      })
+      .then( token => {
+        this.tempToken = token;
+        done();
+      })
+      .catch(done);
+    });
+    before( done => {
+      exampleGallery.userID = this.tempUser._id;
+      new Gallery(exampleGallery).save()
+      .then( gallery => {
+        this.tempGallery = gallery;
+        done();
+      })
+      .catch(done);
+    });
+    after( done => {
+      delete exampleGallery.userID;
+      done();
+    });
     describe('with a valid token and body', () => {
-      before( done => {
-        new User(exampleUser)
-        .generatePasswordHash(exampleUser.password)
-        .then( user => user.save())
-        .then( user => {
-          this.tempUser = user;
-          return user.generateToken();
-        })
-        .then( token => {
-          this.tempToken = token;
-          done();
-        })
-        .catch(done);
-      });
-      before( done => {
-        exampleGallery.userID = this.tempUser._id;
-        new Gallery(exampleGallery).save()
-        .then( gallery => {
-          this.tempGallery = gallery;
-          done();
-        })
-        .catch(done);
-      });
-      after( () => {
-        delete exampleGallery.userID;
-      });
       it('should return an updated gallery', done => {
         let updatedGallery = { name: 'updated gallery', description: 'dis the new shit'};
         request.put(`${url}/api/gallery/${this.tempGallery._id}`)
@@ -216,10 +217,11 @@ describe('Gallery Routes', function () {
     // describe('with an invalid token', () => {
     //   let updatedGallery = { name: 'updated gallery', description: 'dis the new shit'};
     //   it('should return a 401 error', done => {
+    //     console.log('we got here heres temp gallery', this.tempGallery._id);
     //     request.put(`${url}/api/gallery/${this.tempGallery._id}`)
     //     .send(updatedGallery)
     //     .set({
-    //       Authorization: ''
+    //       Authorization: 'Bearer '
     //     })
     //     .send((err, res) => {
     //       expect(res.status).to.equal(401);

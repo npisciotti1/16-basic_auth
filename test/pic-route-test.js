@@ -1,11 +1,10 @@
 'use strict';
 
-require('./lib/test-env.js');
+// require('./lib/test-env.js');
 
 const expect = require('chai').expect;
 const request = require('superagent');
-const debug = require('debug')('cfgram:pic-router-test');
-const awsMocks = require('./lib/aws-mocks.js');
+// const awsMocks = require('./lib/aws-mocks.js');
 
 const Pic = require('../model/pic.js');
 const User = require('../model/user.js');
@@ -34,6 +33,7 @@ const examplePic = {
 };
 
 describe('Pic Routes', function() {
+
   before( done => {
     serverToggle.serverOn(server, done);
   });
@@ -46,11 +46,13 @@ describe('Pic Routes', function() {
       User.remove({}),
       Gallery.remove({})
     ])
-    .then( done => done())
+    .then( () => done())
     .catch(done);
   });
-  describe('POST /api/gallery/:galleryID/pic', function() {
-    describe('with a valid body', function() {
+
+  describe('POST: /api/gallery/:id/pic', function() {
+    describe('with a valid token and valid data', function() {
+      
       before( done => {
         new User(exampleUser)
         .generatePasswordHash(exampleUser.password)
@@ -65,7 +67,6 @@ describe('Pic Routes', function() {
         })
         .catch(done);
       });
-
       before( done => {
         exampleGallery.userID = this.tempUser._id.toString();
         new Gallery(exampleGallery).save()
@@ -75,7 +76,6 @@ describe('Pic Routes', function() {
         })
         .catch(done);
       });
-
       after( done => {
         delete exampleGallery.userID;
         done();
@@ -87,7 +87,7 @@ describe('Pic Routes', function() {
           Authorization: `Bearer ${this.tempToken}`
         })
         .field('name', examplePic.name)
-        .field('desc', examplePic.description)
+        .field('description', examplePic.description)
         .attach('image', examplePic.image)
         .end((err, res) => {
           if (err) return done(err);

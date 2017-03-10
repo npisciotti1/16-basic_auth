@@ -1,17 +1,17 @@
 'use strict';
 
-const path = require('path');
 const fs = require('fs');
-const multer = require('multer');
+const path = require('path');
 const del = require('del');
 const AWS = require('aws-sdk');
+const multer = require('multer');
 const Router = require('express').Router;
 const createError = require('http-errors');
-const debug = require('debug')('cfgram:pic-route');
+const debug = require('debug')('cfgram:pic-router');
 
-const bearerAuth = require('../lib/bearer-auth-middleware.js');
-const Gallery = require('../model/gallery.js');
 const Pic = require('../model/pic.js');
+const Gallery = require('../model/gallery.js');
+const bearerAuth = require('../lib/bearer-auth-middleware.js');
 
 AWS.config.setPromisesDependency(require('bluebird'));
 
@@ -21,10 +21,8 @@ const upload = multer({ dest: dataDir });
 
 const picRouter = module.exports = Router();
 
-function s3UploadProm(params) {
-  debug('s3UploadProm');
-
-  return new Promise((reject, resolve) => {
+function s3uploadProm(params) {
+  return new Promise((resolve, reject) => {
     s3.upload(params, (err, data) => {
       resolve(data);
     });
@@ -34,9 +32,9 @@ function s3UploadProm(params) {
 picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('image'), function(req, res, next) {
   debug('POST /api/gallery/:galleryID/pic');
 
-  if(!req.file) return next(createError(400, 'bad request'));
+  if (!req.file) return next(createError(400, 'file not found'));
 
-  if(!req.file.path) return next(createError(500, 'file not saved'));
+  if (!req.file.path) return next(createError(500, 'file not saved'));
 
   let ext = path.extname(req.file.originalname);
 
@@ -48,7 +46,7 @@ picRouter.post('/api/gallery/:galleryID/pic', bearerAuth, upload.single('image')
   };
 
   Gallery.findById(req.params.galleryID)
-  .then( () => s3UploadProm(params))
+  .then( () => s3uploadProm(params))
   .then( data => {
     del([`${dataDir}/*`]);
     let picData = {
