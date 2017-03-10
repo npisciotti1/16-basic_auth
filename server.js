@@ -1,7 +1,5 @@
 'use strict';
 
-//teehee
-
 const express = require('express');
 const debug = require('debug')('cfgram:server');
 const Promise = require('bluebird');
