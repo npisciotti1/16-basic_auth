@@ -2,7 +2,6 @@
 
 const express = require('express');
 const debug = require('debug')('cfgram:server');
-const Promise = require('bluebird');
 const cors = require('cors');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
