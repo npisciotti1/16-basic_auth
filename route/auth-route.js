@@ -24,8 +24,8 @@ authRouter.post('/api/signup', jsonParser, function(req, res, next) {
   .catch( () => next(createError(400, 'bad request')));
 });
 
-authRouter.get('/api/signin', basicAuth, function(req, res, next) {
-  debug('GET: /api/signin');
+authRouter.get('/api/login', basicAuth, function(req, res, next) {
+  debug('GET: /api/login');
 
   User.findOne({ username: req.auth.username })
   .then( user => user.comparePasswordHash(req.auth.password))

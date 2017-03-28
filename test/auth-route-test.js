@@ -54,7 +54,7 @@ describe('Auth Routes', function() {
     });
   });
 
-  describe('GET: /api/signin', function() {
+  describe('GET: /api/login', function() {
     describe('With a valid body', () => {
       before( done => {
         let user = new User(exampleUser);
@@ -72,7 +72,7 @@ describe('Auth Routes', function() {
         .catch(done);
       });
       it('should return a token', done => {
-        request.get(`${url}/api/signin`)
+        request.get(`${url}/api/login`)
         .auth('nikko', 'soopersekret')
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -83,7 +83,7 @@ describe('Auth Routes', function() {
 
       describe('with an invalid body', function() {
         it('should return a 401 error', done => {
-          request.get(`${url}/api/signin`)
+          request.get(`${url}/api/login`)
           .auth('just-nikko')
           .end((err, res) => {
             expect(res.status).to.equal(401);
