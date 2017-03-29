@@ -44,3 +44,13 @@ galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next) {
   .then( () => res.status(204).send('no content'))
   .catch( () => next(createError(404, 'not found')));
 });
+
+//request all galleries
+
+galleryRouter.get('/api/gallery', bearerAuth, function(req, res, next) {
+  debug('GET /api/gallery');
+
+  Gallery.find({})
+  .then( galleries => res.status(200).send(galleries))
+  .catch( () => next(createError(404, 'not found')));
+});
