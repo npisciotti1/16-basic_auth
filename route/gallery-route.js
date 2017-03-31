@@ -32,9 +32,15 @@ galleryRouter.get('/api/gallery/:id', bearerAuth, function(req, res, next) {
 galleryRouter.put('/api/gallery/:id', bearerAuth, jsonParser, function(req, res, next) {
   debug('PUT /api/gallery/:id');
 
-  Gallery.findByIdAndUpdate(req.params.id, req.body, {new: true})
+  Gallery.findById(req.params.id)
+  .then( gallery => {
+    if( gallery.userID.toString() !== req.params.id.toString() ) {
+      return Promise.reject(createError(404, 'not found'));
+    }
+    return Gallery.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  })
   .then( gallery => res.json(gallery))
-  .catch( () => next(createError(404, 'not found')));
+  .catch( () => next(createError(400, 'bad request')));
 });
 
 galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next) {
@@ -50,7 +56,8 @@ galleryRouter.delete('/api/gallery/:id', bearerAuth, function(req, res, next) {
 galleryRouter.get('/api/gallery', bearerAuth, function(req, res, next) {
   debug('GET /api/gallery');
 
-  Gallery.find({})
+  Gallery.find({ userID: req.body.userID })
+  .populate('pics')
   .then( galleries => res.status(200).send(galleries))
   .catch( () => next(createError(404, 'not found')));
 });
